@@ -1,0 +1,16 @@
+{
+    "name": "payout-cloud-server",
+    "version": "1.0.0",
+    "description": "Cloud Backend for Payout Software",
+    "main": "index.js",
+    "type": "module",
+    "scripts": {
+        "start": "node index.js"
+    },
+    "dependencies": {
+        "cors": "^2.8.5",
+        "dotenv": "^16.3.1",
+        "express": "^4.18.2",
+        "firebase-admin": "^11.11.1"
+    }
+}
