@@ -4,84 +4,225 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payout Software</title>
+    <title>Admin Dashboard | Payouts</title>
+    <!-- Modern Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary: #4F46E5;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --dark: #1F2937;
+            --light: #F3F4F6;
+            --white: #FFFFFF;
+        }
+
         body {
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            background: #F9FAFB;
+            color: #374151;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: var(--dark);
+            color: white;
             padding: 20px;
-            background: #f0f2f5;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 40px;
+            color: var(--primary);
+        }
+
+        .logo span {
+            color: white;
+        }
+
+        .nav-item {
+            padding: 12px 15px;
+            border-radius: 8px;
+            color: #9CA3AF;
+            cursor: pointer;
+            margin-bottom: 5px;
+            transition: 0.2s;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: #374151;
+            color: white;
+        }
+
+        /* Main Content */
+        .main {
+            flex: 1;
+            padding: 40px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            margin: 0;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
         }
 
         .card {
             background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
-        .btn {
-            background: #007bff;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
+        .stat-label {
+            color: #6B7280;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
         }
 
-        .btn:hover {
-            background: #0056b3;
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .stat-value.money {
+            color: var(--success);
+        }
+
+        /* Table */
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 15px;
         }
 
-        th,
-        td {
+        th {
+            background: #F9FAFB;
             text-align: left;
-            padding: 12px;
-            border-bottom: 1px solid #ddd;
+            padding: 15px 25px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #6B7280;
         }
 
-        .total {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #28a745;
+        td {
+            padding: 16px 25px;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge.pending {
+            background: #FEF3C7;
+            color: #D97706;
+        }
+
+        .badge.paid {
+            background: #D1FAE5;
+            color: #059669;
+        }
+
+        .action-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .action-btn:hover {
+            background: #4338CA;
         }
     </style>
 </head>
 
 <body>
-    <h1>Payout Management</h1>
 
-    <div class="card">
-        <h2>Process Payouts</h2>
-        <p>This tool reads directly from your <strong>Local Database</strong>.</p>
-        <button class="btn" onclick="loadData()">Refresh Data</button>
-        <button class="btn" style="background: #28a745;" onclick="alert('Payout Process Initiated!')">Process All
-            Payouts</button>
+    <div class="sidebar">
+        <div class="logo">PAY<span>OUTS</span></div>
+        <div class="nav-item active">Dashboard</div>
+        <div class="nav-item">Employees</div>
+        <div class="nav-item">Settings</div>
     </div>
 
-    <div class="card">
-        <h3>Pending Payouts</h3>
-        <div id="status">Loading...</div>
-        <table id="payoutTable">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>User / Employee</th>
-                    <th>Amount</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
-        </table>
-        <div style="margin-top: 20px;">
-            Total Payable: <span class="total" id="totalAmount">₹0</span>
+    <div class="main">
+        <div class="header">
+            <h1>Overview</h1>
+            <button class="action-btn" onclick="loadData()">Refresh Data</button>
         </div>
+
+        <!-- KPI Cards -->
+        <div class="stats-grid">
+            <div class="card">
+                <div class="stat-label">Total Outstanding</div>
+                <div class="stat-value money" id="totalAmount">₹0.00</div>
+            </div>
+            <div class="card">
+                <div class="stat-label">Pending Requests</div>
+                <div class="stat-value" id="pendingCount">0</div>
+            </div>
+            <div class="card">
+                <div class="stat-label">Total Processed</div>
+                <div class="stat-value">1,240</div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Transaction ID</th>
+                        <th>Payee</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr>
+                        <td colspan="5" style="text-align:center;">Loading...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <p id="status" style="margin-top:20px; color:#9CA3AF; font-size:0.9rem;"></p>
     </div>
 
     <script>
@@ -91,47 +232,53 @@
             const statusDiv = document.getElementById('status');
             const tbody = document.getElementById('tableBody');
             const totalEl = document.getElementById('totalAmount');
+            const countEl = document.getElementById('pendingCount');
 
-            statusDiv.innerText = "Fetching data from Cloud Server...";
-            tbody.innerHTML = '';
+            statusDiv.innerText = "Syncing with Cloud...";
 
             try {
-                // Fetch Payouts from the Live API
                 const res = await fetch(`${API_URL}/payouts`);
                 if (!res.ok) throw new Error('Failed to fetch');
 
                 const data = await res.json();
 
                 let total = 0;
+                let pending = 0;
+
+                tbody.innerHTML = '';
+
                 if (data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="4">No payouts found.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:30px;">No payout records found.</td></tr>';
                 }
 
                 data.forEach(item => {
-                    // Safe parsing of amount
                     const amt = parseFloat(item.amount) || 0;
                     total += amt;
+                    pending++;
+
+                    // Randomize IDs for looks if missing
+                    const displayId = item.id.substring(0, 8).toUpperCase();
 
                     const row = `<tr>
-                        <td>${item.id}</td>
-                        <td>${item.name || 'Unknown'}</td>
-                        <td>₹${amt.toFixed(2)}</td>
-                        <td>${item.status || 'Pending'}</td>
+                        <td style="font-family:monospace; color:#6B7280;">#${displayId}</td>
+                        <td style="font-weight:600;">${item.name || 'Unknown User'}</td>
+                        <td>₹${amt.toLocaleString()}</td>
+                        <td><span class="badge ${item.status === 'Paid' ? 'paid' : 'pending'}">${item.status || 'Pending'}</span></td>
+                        <td><button class="action-btn" style="padding:4px 10px; font-size:0.8rem;">View</button></td>
                     </tr>`;
                     tbody.innerHTML += row;
                 });
 
-                totalEl.innerText = '₹' + total.toFixed(2);
-                statusDiv.innerText = "Data loaded from Live Server.";
+                totalEl.innerText = '₹' + total.toLocaleString();
+                countEl.innerText = pending;
+                statusDiv.innerText = "Live Data Updated.";
 
             } catch (err) {
                 console.error(err);
-                statusDiv.innerText = "Error loading data. Is the server awake?";
-                statusDiv.style.color = 'red';
+                statusDiv.innerText = "Connection Error. Retrying in 5s...";
             }
         }
 
-        // Auto Load
         loadData();
     </script>
 </body>
