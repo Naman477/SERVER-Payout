@@ -11,6 +11,12 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static('public')); // Serve index.html
+
+// Route for Payout Dashboard
+app.get('/dashboard', (req, res) => {
+    res.sendFile('index.html', { root: './public' });
+});
 
 // --- Firebase Setup ---
 // On Render, we can't easily upload a file, so we'll use an Environment Variable

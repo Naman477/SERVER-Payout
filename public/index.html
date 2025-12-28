@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payout Software</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            padding: 20px;
+            background: #f0f2f5;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .total {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #28a745;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Payout Management</h1>
+
+    <div class="card">
+        <h2>Process Payouts</h2>
+        <p>This tool reads directly from your <strong>Local Database</strong>.</p>
+        <button class="btn" onclick="loadData()">Refresh Data</button>
+        <button class="btn" style="background: #28a745;" onclick="alert('Payout Process Initiated!')">Process All
+            Payouts</button>
+    </div>
+
+    <div class="card">
+        <h3>Pending Payouts</h3>
+        <div id="status">Loading...</div>
+        <table id="payoutTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>User / Employee</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+        <div style="margin-top: 20px;">
+            Total Payable: <span class="total" id="totalAmount">₹0</span>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://server-payout.onrender.com';
+
+        async function loadData() {
+            const statusDiv = document.getElementById('status');
+            const tbody = document.getElementById('tableBody');
+            const totalEl = document.getElementById('totalAmount');
+
+            statusDiv.innerText = "Fetching data from Cloud Server...";
+            tbody.innerHTML = '';
+
+            try {
+                // Fetch Payouts from the Live API
+                const res = await fetch(`${API_URL}/payouts`);
+                if (!res.ok) throw new Error('Failed to fetch');
+
+                const data = await res.json();
+
+                let total = 0;
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4">No payouts found.</td></tr>';
+                }
+
+                data.forEach(item => {
+                    // Safe parsing of amount
+                    const amt = parseFloat(item.amount) || 0;
+                    total += amt;
+
+                    const row = `<tr>
+                        <td>${item.id}</td>
+                        <td>${item.name || 'Unknown'}</td>
+                        <td>₹${amt.toFixed(2)}</td>
+                        <td>${item.status || 'Pending'}</td>
+                    </tr>`;
+                    tbody.innerHTML += row;
+                });
+
+                totalEl.innerText = '₹' + total.toFixed(2);
+                statusDiv.innerText = "Data loaded from Live Server.";
+
+            } catch (err) {
+                console.error(err);
+                statusDiv.innerText = "Error loading data. Is the server awake?";
+                statusDiv.style.color = 'red';
+            }
+        }
+
+        // Auto Load
+        loadData();
+    </script>
+</body>
+
+</html>
